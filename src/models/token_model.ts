@@ -5,4 +5,5 @@ export interface UserToken extends JwtPayload {
   username: string;
   full_name: string;
   phone_number: string;
+  availability: string;
 }
