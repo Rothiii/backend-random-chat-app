@@ -91,6 +91,7 @@ export class AuthService {
         full_name: validateData.full_name,
         phone_number: validateData.phone_number,
         password: hashingPassword,
+        availability: "available",
       },
       select: {
         user_id: true,
