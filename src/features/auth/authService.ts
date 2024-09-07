@@ -28,7 +28,7 @@ export class AuthService {
       where: {
         OR: [
           {
-            email: validateData.username_or_phone_number,
+            username: validateData.username_or_phone_number,
           },
           {
             phone_number: validateData.username_or_phone_number,
@@ -112,7 +112,7 @@ export class AuthService {
       },
       select: {
         user_id: true,
-        email: true,
+        username: true,
         full_name: true,
         phone_number: true,
       },
