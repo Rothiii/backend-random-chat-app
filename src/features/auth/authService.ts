@@ -39,6 +39,9 @@ export class AuthService {
       select: {
         user_id: true,
         password: true,
+        username: true,
+        full_name: true,
+        phone_number: true,
       },
     });
 
@@ -68,6 +71,8 @@ export class AuthService {
     const token = jwt.sign(
       {
         user_id: userData.user_id,
+        username: userData.username,
+        full_name: userData.full_name,
       },
       process.env.JWT_SECRET!,
       {
