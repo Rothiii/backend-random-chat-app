@@ -94,7 +94,7 @@ export class ChatService {
   public sendMessage(socket: Socket, message: string): void {
     const room = Array.from(socket.rooms)[1];
     if (room) {
-      console.log(`Nama room: ${room}`)// Room is the second entry
+      console.log(`Nama room: ${room}`)
       socket.to(room).emit("receiveMessage", {
         username: socket.data.user.username,
         message: message,

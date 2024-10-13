@@ -31,8 +31,6 @@
     </div>
 
     <script>
-      let socket;
-      socket = io("http://localhost:3000");
       const loginButton = document.getElementById("login-button");
       const messageContainer = document.getElementById("message-container");
       const messageInput = document.getElementById("message-input");
@@ -76,6 +74,7 @@
 
         // Handle receiving message
         socket.on("receiveMessage", (data) => {
+          appendMessage(`Annonymous: ${data.message}`);
           appendMessage(`${data.username}: ${data.message}`);
         });
 

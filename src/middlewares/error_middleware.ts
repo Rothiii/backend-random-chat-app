@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ErrorResponse } from "../models";
 import { JsonWebTokenError } from "jsonwebtoken";
+import { ZodError } from "zod";
 
 export class ErrorMiddleware {
   static async notFound(_req: Request, _res: Response, next: NextFunction) {
@@ -20,6 +21,16 @@ export class ErrorMiddleware {
         code: err.name === "TokenExpiredError" ? 401 : 403,
         status: err.name,
         message: err.message,
+      });
+    } else if (err instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        code: 400,
+        status: "VALIDATION_ERROR",
+        errors: err.issues.map((issue) => ({
+          [issue.path.join(".")]: issue.message,
+        })),
+        tags: err.issues.map((issue) => issue.path.join(".")),
       });
     } else if (err instanceof ErrorResponse) {
       return res.status(err.statusCode).json({
