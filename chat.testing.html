@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login & Chat</title>
+    <style>
+      /* Add your styles here */
+      #chat-container {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="/socket.io/socket.io.js"></script>
+    <div id="login-container">
+      <h2>Login</h2>
+      <input id="username" type="text" placeholder="Username" />
+      <input id="password" type="password" placeholder="Password" />
+      <button id="login-button">Login</button>
+    </div>
+
+    <div id="chat-container">
+      <div id="message-container"></div>
+      <input
+        id="message-input"
+        type="text"
+        placeholder="Type your message..."
+      />
+      <button id="send-button">Send</button>
+    </div>
+
+    <script>
+      const loginButton = document.getElementById("login-button");
+      const messageContainer = document.getElementById("message-container");
+      const messageInput = document.getElementById("message-input");
+      const sendButton = document.getElementById("send-button");
+
+      loginButton.addEventListener("click", async () => {
+        const username_or_phone_number =
+          document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        // Request to login
+        const response = await fetch("http://localhost:3000/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username_or_phone_number, password }),
+        });
+
+        const data = await response.json();
+        if (data.data.token) {
+          // Save token in localStorage
+          localStorage.setItem("token", data.data.token);
+
+          // Initialize socket connection after login
+          initializeSocket(data.data.token);
+
+          // Hide login, show chat
+          document.getElementById("login-container").style.display = "none";
+          document.getElementById("chat-container").style.display = "block";
+        } else {
+          alert("Login failed");
+        }
+      });
+      function initializeSocket(token) {
+        socket = io("http://localhost:3000", {
+          extraHeaders: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // Handle receiving message
+        socket.on("receiveMessage", (data) => {
+          appendMessage(`Annonymous: ${data.message}`);
+          appendMessage(`${data.username}: ${data.message}`);
+        });
+
+        // Handle waiting status
+        socket.on("waiting", (message) => {
+          appendMessage(message);
+        });
+
+        socket.on("matching", (message) => {
+          appendMessage(message);
+        });
+
+        // Handle room connection
+        socket.on("joinRoom", (room_id, message) => {
+          console.log("Received room_id:", room_id); // Add logging
+          socket.emit("joinRoomAck", room_id); // Optional acknowledgment
+          appendMessage(message);
+        });
+
+        sendButton.addEventListener("click", () => {
+          const message = messageInput.value;
+          if (message) {
+            socket.emit("sendMessage", message);
+            appendMessage(`You: ${message}`);
+            messageInput.value = "";
+          }
+        });
+      }
+
+      // Append message to chat container
+      function appendMessage(message) {
+        const messageElement = document.createElement("p");
+        messageElement.innerText = message;
+        messageContainer.append(messageElement);
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+      }
+    </script>
+  </body>
+</html>

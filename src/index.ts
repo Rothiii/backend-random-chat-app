@@ -1,5 +1,8 @@
-import app from "./app";
+import server from "./app";
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on ${process.env.API_URL? process.env.API_URL : "http://localhost:"}${process.env.PORT}`);
+const port = process.env.PORT;
+const url_server = process.env.API_URL? process.env.API_URL : `http://localhost:${port}`;
+
+server.listen(port, () => {
+  console.log(`Server running on ${url_server}`);
 });

@@ -19,6 +19,7 @@ model User {
   password                 String
   full_name                String
   phone_number             String                   @db.VarChar(15)
+  availability             String
   created_at               DateTime                 @default(now())
   deleted_at               DateTime?
 
