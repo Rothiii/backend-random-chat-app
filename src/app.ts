@@ -29,7 +29,8 @@ app.get("/", (_req, res) => {
 });
 app.use("/auth", authRoute);
 
-const chatController = new ChatController(io);
+const chatNamespace = io.of("/socket_anonymous_chat");
+const chatController = new ChatController(chatNamespace);
 chatController.initialize();
 
 app.use(ErrorMiddleware.notFound);

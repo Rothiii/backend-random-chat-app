@@ -1,13 +1,13 @@
-import { Server, Socket } from "socket.io";
+import { Namespace, Server, Socket } from "socket.io";
 import { ChatService } from "./chatService";
 import jwt from "jsonwebtoken";
 import { ErrorResponse, UserToken } from "../../models";
 
 export class ChatController {
-  private io: Server;
+  private io: Namespace;
   private chatService: ChatService;
 
-  constructor(io: Server) {
+  constructor(io: Namespace) {
     this.io = io;
     this.chatService = new ChatService();
   }

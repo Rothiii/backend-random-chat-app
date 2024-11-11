@@ -47,10 +47,10 @@ export class AuthService {
 
     if (!userData) {
       throw new ErrorResponse(
-        "Invalid Email or Phone Number",
+        "Wrong Username or Phone Number",
         401,
-        ["email", "password"],
-        "INVALID_username_or_phone_number"
+        ["username_or_phone_number"],
+        "WRONG_username_or_phone_number"
       );
     }
 
@@ -63,7 +63,7 @@ export class AuthService {
       throw new ErrorResponse(
         "Invalid Password",
         401,
-        ["email", "password"],
+        ["password"],
         "INVALID_PASSWORD"
       );
     }
