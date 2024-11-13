@@ -6,6 +6,7 @@ export class ChatService {
   private users: User[] = [];
   private rooms: Map<string, ChatRoom> = new Map();
   private userConnections: Map<string, string[]> = new Map();
+  private roomUsers: Map<string, { user1: User, user2: User }> = new Map();
 
   // Add user to list of available users
   public addUser(socket: Socket): void {
@@ -21,26 +22,38 @@ export class ChatService {
   public removeUser(socket: Socket): void {
     const user = socket.data.user;
     console.log("Removing user:", user.username); // Logging user removal
+    // socket.emit("partnerDisconnected", "Your chat partner has disconnected.");
     this.users = this.users.filter((u) => u.user_id !== user.user_id);
   }
   // when user disconnects from the chat room, remove the user from the list of available users and remove the other user from the chat room
-  // private disconnectUser(socket: Socket): void {
-  //   const user = socket.data.user;
-  //   const room = Array.from(socket.rooms)[1]; // Assuming the room ID is the second entry
+  // Update disconnectUser function to handle partner disconnection
+//   public disconnectUser(socket: Socket): void {
+//     const user = socket.data.user;
+//     const room = Array.from(socket.rooms)[0]; // Assuming the room ID is the second entry
+//     if (room) {
+//         const roomUsers = this.roomUsers.get(room);
+//         if (roomUsers) {
+//             const otherUser = roomUsers.user1.user_id === user.user_id ? roomUsers.user2 : roomUsers.user1;
+            
+//             // Emit an event to the other user that their partner disconnected
+//             if (otherUser) {
+//                 socket.to(otherUser.username).emit("partnerDisconnected", "Your chat partner has disconnected.");
+                
+//                 // Mark the other user as available to be matched again
+//                 otherUser.availability = "available";
+//                 const otherUserSocket = socket.nsp.sockets.get(otherUser.username);
+//                 if (otherUserSocket) {
+//                     this.tryMatchUser(otherUserSocket); // Retry match for other user
+//                 }
+//             }
+            
+//             socket.leave(room);
+//             this.roomUsers.delete(room);
+//         }
+//     }
+//   console.log("User disconnected:", user.username);
+// }
 
-  //   if (room) {
-  //     const roomUsers = this.roomUsers.get(room);
-  //     if (roomUsers) {
-  //       const otherUser = roomUsers.user1.user_id === user.user_id ? roomUsers.user2 : roomUsers.user1;
-  //       if (otherUser) {
-  //         socket.to(otherUser.username).emit("disconnected", "The other user has disconnected.");
-  //         socket.leave(room);
-  //         socket.leave(socket.to(socket.data.user.username).socket, room);
-  //       }
-  //       this.roomUsers.delete(room);
-  //     }
-  //   }
-  // }
 
   public tryMatchUser(socket: Socket): void {
     const user = socket.data.user;
@@ -49,7 +62,6 @@ export class ChatService {
     
     const availableUsers = this.users.find(u => 
       u.user_id !== user.user_id && u.availability === "available" 
-      // && !this.hasMatchedBefore(user.user_id, u.user_id) 
     );
     console.log("Available user found:", availableUsers?.username);
     if (availableUsers) {

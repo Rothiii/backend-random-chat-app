@@ -19,29 +19,32 @@ export class ChatController {
       console.log("A user connected:", socket.data.user.username);
       this.chatService.addUser(socket);
 
-      // Handle sending message
       socket.on("sendMessage", (message: string) => {
         console.log("Message received:", message);
         this.chatService.sendMessage(socket, message);
       });
 
       socket.on("joinRoomAck", (room_id) => {
-        // socket.join(room_id);
         this.chatService.joinRoom(socket, room_id);
         console.log(socket.data.user.username, "acknowledged room:", room_id);
       });
 
-      socket.on("joinRoom", (room_id) => {
-        this.chatService.joinRoom(socket, room_id);
-      });
-
       socket.on("disconnect", () => {
         this.chatService.removeUser(socket);
-        console.log("User disconnected:", socket.data.user.username);
+        // this.chatService.disconnectUser(socket);
+      });
+
+      socket.on("partnerDisconnected", () => {
+        console.log("Partner disconnected");
+        const room = socket.rooms.values().next().value;
+        if (room) {
+          socket.leave(room);
+        }
+        this.chatService.addUser(socket);
       });
     });
   }
-
+  
   // Middleware to authenticate socket connections
   private authenticateSocket = async (
     socket: Socket,
