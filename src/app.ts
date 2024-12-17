@@ -8,6 +8,7 @@ import { ErrorMiddleware } from "./middlewares";
 import { authRoute } from "./features/auth";
 import { ChatController } from "./features/chat/chatController";
 import morgan from "morgan";
+import chatBotRoute from "./features/chatbot/chatBotRoute";
 
 dotenv.config();
 const app: Express = express();
@@ -28,6 +29,7 @@ app.get("/", (_req, res) => {
   res.sendFile("D:/Data Kuliah/Semester 7/PAPB/Code/backend_chat_with_stranger/chat.testing.html");
 });
 app.use("/auth", authRoute);
+app.use("/bot", chatBotRoute);
 
 const chatNamespace = io.of("/socket_anonymous_chat");
 const chatController = new ChatController(chatNamespace);
